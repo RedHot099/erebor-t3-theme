@@ -24,7 +24,13 @@ The usage and context rows exist only while the thread details card is open. Whe
 
 The built theme is committed in `dist/`, so installing needs only T3 Code and this repository. You do not need Python or a build.
 
-1. Get the repository on the computer: clone it (`git clone <repository URL> erebor`) or copy the folder.
+1. Get the repository on the computer:
+
+   ```sh
+   git clone https://github.com/RedHot099/erebor-t3-theme.git
+   cd erebor-t3-theme
+   ```
+
 2. Copy the two theme files into T3 Code's theme folder.
    - On Linux or macOS, run the install script from the repository folder:
 
