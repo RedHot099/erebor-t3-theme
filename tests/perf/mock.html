@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Erebor theme preview</title>
+<!--
+  A mock of the T3 Code DOM (same stable selectors and aria-labels the app renders) with the real
+  theme CSS from dist/erebor.css. Controls change the mock DOM only, never the theme's variables.
+  Query: ?ctx=0..100&dw=0..5&ch=<card px>&state=working|waiting|done|doze|failed&s=0..100&wk=0..100&sb=0|1&det=0|1&w=<app px>&prov=claude,codex,other&lone=0|1
+-->
+<script>
+(function(){const q=new URLSearchParams(location.search);const l=document.createElement('link');l.rel='stylesheet';
+l.href=q.get('css')||'../../dist/erebor.css';document.head.appendChild(l);})();
+</script>
+<style>
+:root { --chat-content-max-width: 46rem; --sidebar-width: 256px; }
+html, body { margin: 0; height: 100%; background: #000; color: #d8dce2; overflow: hidden;
+  font: 14px/1.55 Inter, "Noto Sans", system-ui, sans-serif; }
+.app { display: flex; height: 100vh; width: var(--app-w, 100vw); }
+[data-slot="sidebar"] { width: var(--sidebar-width); flex: none; background: #0b0c0f; border-right: 1px solid #1c1f25;
+  padding: 12px 8px; box-sizing: border-box; }
+.app.nosb [data-slot="sidebar"] { display: none; }
+[data-sidebar-row] { padding: 6px 10px; border-radius: 8px; font-size: 13px; color: #c9ced6; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; }
+[data-sidebar-row][aria-current="page"] { background: #262a31; }
+[data-sidebar-row] small { color: #858d99; }
+[data-workspace-area="conversation"] { flex: 1; min-width: 0; position: relative; overflow: hidden; }
+[data-chat-header] { height: 44px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #1c1f25;
+  background: rgba(11, 12, 15, .7); font-weight: 600; }
+.lane { position: absolute; left: 50%; transform: translateX(-50%); width: min(var(--chat-content-max-width), 100% - 32px);
+  top: 60px; bottom: 170px; display: flex; flex-direction: column; justify-content: flex-end; gap: 16px; overflow: hidden; }
+[data-user-message-bubble] { align-self: flex-end; max-width: 80%; background: rgba(26, 30, 36, .96);
+  border: 1px solid #262a31; border-radius: 14px; padding: 10px 14px; }
+.chat-markdown p { margin: 0 0 8px; }
+[data-subagent-group] button { all: unset; display: flex; gap: 10px; align-items: center; font-size: 12px; color: #c9ced6;
+  border: 1px solid #262a31; border-radius: 10px; padding: 6px 10px; background: rgba(16, 18, 21, .8); }
+[data-subagent-group] button span { color: #6cb6ff; }
+.mock-subagent[hidden] { display: none; }
+.mock-subagent .flex { display: inline-flex; align-items: center; }
+.mock-subagent .size-6 { display: inline-grid; place-items: center; width: 24px; height: 24px;
+  border-radius: 50%; background: #262a31; }
+.mock-subagent svg { width: 14px; height: 14px; fill: currentColor; }
+[data-chat-composer-form] { position: absolute; left: 50%; transform: translateX(-50%); bottom: 40px;
+  width: min(var(--chat-content-max-width), 100% - 32px); }
+[data-slot="composer-host"] { height: 104px; box-sizing: border-box; background: rgba(16, 18, 21, .94); border: 1px solid #262a31;
+  border-radius: 16px; padding: 14px 16px; color: #858d99; position: relative; }
+[data-slot="composer-host"] button { position: absolute; right: 12px; bottom: 12px; width: 30px; height: 30px; border-radius: 50%;
+  border: 0; background: #cf9f4a; }
+[data-slot="composer-host"] button[aria-label="Stop generation"] { border-radius: 8px; background: #d8dce2; }
+[data-pending-user-input-toggle] { position: absolute; left: 0; right: 0; top: -40px; font-size: 12px; color: #efc77a; }
+/* the app's inline details panel: absolute over the conversation, 12 px from its right edge, 280 px wide */
+.details { position: absolute; right: 12px; top: 54px; width: 280px; z-index: 20; }
+.details [data-thread-details-card] { height: var(--card-h, 300px); box-sizing: border-box; padding: 12px;
+  background: rgba(22, 25, 30, .92); border: 1px solid #262a31; border-radius: 16px; font-size: 12px; }
+[data-thread-details-card] div { padding: 4px 8px; border-radius: 8px; color: #858d99; }
+#ctl { position: fixed; left: 8px; bottom: 8px; z-index: 10; width: 240px; padding: 8px; border-radius: 10px;
+  background: rgba(23, 26, 31, .96); border: 1px solid #3b414b; font-size: 12px; display: grid; gap: 4px; }
+#ctl label { display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+#ctl input[type=range] { width: 120px; accent-color: #cf9f4a; }
+#ctl .seg { display: flex; flex-wrap: wrap; gap: 3px; }
+#ctl button { font: inherit; font-size: 11px; color: #d8dce2; background: #262a31; border: 0; border-radius: 5px; padding: 1px 6px; }
+#ctl button[aria-pressed="true"] { background: #cf9f4a; color: #17120a; }
+.hide-ctl #ctl { display: none; }
+</style>
+<script>document.documentElement.style.setProperty('--theme-background-image', `url("${new URL('../../dist/erebor.png', location.href)}")`);</script>
+</head>
+<body>
+<div class="app" id="app">
+  <div data-slot="sidebar">
+    <div data-sidebar-row="t0" id="row">Erebor theme</div>
+    <div data-sidebar-row="t1" aria-label="Omarchy palette, scratch">Omarchy palette <small>· idle</small></div>
+    <div data-sidebar-row="t2" aria-label="Dotfiles cleanup, Done, dotfiles">Dotfiles cleanup <small>· Done</small></div>
+  </div>
+  <main data-workspace-area="conversation">
+    <div data-chat-header>Erebor theme</div>
+    <div class="lane" id="lane">
+      <div data-user-message-bubble>Make the dwarves walk to their workstations before they start mining.</div>
+      <div class="mock-subagent" data-subagent-group id="sg"><button id="sgb"><span id="avatars" class="flex shrink-0 items-center -space-x-1.5" aria-hidden="true"></span><b id="sgn"></b> <span id="sgd"></span></button></div>
+      <div class="mock-subagent" id="solo" hidden></div>
+      <div class="chat-markdown">
+        <p>Each subagent now gets a dwarf that walks in from the stairs of its hall and starts working once it reaches the vein.</p>
+        <p>The mines are shortened from the left when the sidebar opens; the king, the throne and the dragon's head stay in view.</p>
+      </div>
+    </div>
+    <form data-chat-composer-form>
+      <div id="pending" hidden>1 question waiting for your answer</div>
+      <div data-slot="composer-host">Ask for follow-up changes…<button type="button" id="send" aria-label="Send"></button></div>
+    </form>
+    <aside class="details" id="dpanel" data-thread-details-panel="inline"><div data-thread-details-card>
+      <div>vivobook14s</div><div>Open in VS Code</div><div>Add project script</div>
+      <div>Previous agents 12</div>
+      <section aria-label="Usage limits"><div id="sessrow"></div><div id="weekrow"></div><div id="fablerow" aria-label="Weekly · Fable: 84% left">Weekly · Fable 84%</div></section>
+      <section aria-label="Context window"><div id="ctxrow"></div></section>
+    </div></aside>
+  </main>
+</div>
+
+<div id="ctl">
+  <label>Context <input id="ctx" type="range" min="0" max="100"><span id="ctxv"></span></label>
+  <label>5h left <input id="se" type="range" min="0" max="100"></label>
+  <label>Week left <input id="wk" type="range" min="0" max="100"></label>
+  <div>Subagents <span class="seg" id="dw"></span></div>
+  <div class="seg" id="st"></div>
+  <div class="seg"><button id="sb">sidebar</button><button id="det">details</button>
+    <button data-w="1800">1800</button><button data-w="1920">1920</button><button data-w="2560">2560</button></div>
+</div>
+
+<script>
+(function () {
+  const q = new URLSearchParams(location.search);
+  const num = (k, lo, hi, d) => { const v = parseInt(q.get(k) ?? '', 10); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+  const S = { ctx: num('ctx', 0, 100, 47), dw: num('dw', 0, 5, 2), ch: num('ch', 100, 900, 300), state: q.get('state') || 'working',
+    s: num('s', 0, 100, 62), wk: num('wk', 0, 100, 80), sb: q.get('sb') !== '0', det: q.get('det') !== '0',
+    w: num('w', 600, 4000, 0) };
+  if (q.get('ui') === '0') document.documentElement.classList.add('hide-ctl');
+  const $ = id => document.getElementById(id);
+  const providers = (q.get('prov') || '').split(',');
+  const viewBoxes = { claude: '0 0 256 257', codex: '100 100 411 411', other: '0 0 24 24' };
+  function avatar(provider) {
+    const box = Object.hasOwn(viewBoxes, provider) ? viewBoxes[provider] : null;
+    if (!box && provider !== 'initials') return '';
+    const [x, y, w, h] = box?.split(' ').map(Number) ?? [];
+    const icon = box ? `<svg viewBox="${box}"><path d="M${x + w / 2} ${y}l${w / 2} ${h}h-${w}Z"/></svg>` : 'AI';
+    return `<span aria-hidden="true" class="relative inline-flex size-6"><span class="relative isolate">${icon}</span></span>`;
+  }
+
+  const stSeg = $('st'), dwSeg = $('dw');
+  for (const n of ['working', 'waiting', 'done', 'doze', 'failed']) {
+    const b = document.createElement('button'); b.textContent = n; b.dataset.n = n;
+    b.onclick = () => { S.state = n; apply(); }; stSeg.appendChild(b);
+  }
+  for (let i = 0; i <= 5; i++) {
+    const b = document.createElement('button'); b.textContent = i; b.dataset.n = i;
+    b.onclick = () => { S.dw = i; apply(); }; dwSeg.appendChild(b);
+  }
+  $('ctx').oninput = e => { S.ctx = +e.target.value; apply(); };
+  $('se').oninput = e => { S.s = +e.target.value; apply(); };
+  $('wk').oninput = e => { S.wk = +e.target.value; apply(); };
+  $('sb').onclick = () => { S.sb = !S.sb; apply(); };
+  $('det').onclick = () => { S.det = !S.det; apply(); };
+  document.querySelectorAll('[data-w]').forEach(b => b.onclick = () => { S.w = S.w === +b.dataset.w ? 0 : +b.dataset.w; apply(); });
+
+  function apply() {
+    const app = $('app');
+    app.classList.toggle('nosb', !S.sb);
+    // the app unmounts the inline details panel when it is closed
+    $('dpanel').hidden = !S.det; S.det ? $('dpanel').setAttribute('data-thread-details-panel', 'inline') : $('dpanel').removeAttribute('data-thread-details-panel');
+    $('dpanel').style.setProperty('--card-h', S.ch + 'px');
+    app.style.setProperty('--app-w', S.w ? S.w + 'px' : '100vw');
+    // thread details card rows, exactly as the app labels them
+    $('ctxrow').setAttribute('aria-label', `Context: ${S.ctx}% used`); $('ctxrow').textContent = `Context ${S.ctx}%`;
+    $('sessrow').setAttribute('aria-label', `Session: ${S.s}% left`); $('sessrow').textContent = `Session ${S.s}% left`;
+    $('weekrow').setAttribute('aria-label', `Weekly: ${S.wk}% left`); $('weekrow').textContent = `Weekly ${S.wk}% left`;
+    // the app unmounts the details card when the panel closes, so its rows stop matching
+    if (!S.det) for (const id of ['ctxrow', 'sessrow', 'weekrow']) $(id).removeAttribute('aria-label');
+    // subagent group header: "N subagents", aria-description "K working · M done"
+    const sg = $('sg'), done = 1;
+    const solo = $('solo');
+    const lone = S.dw === 1 && q.get('lone') === '1';
+    solo.hidden = !lone;
+    solo.toggleAttribute('data-v2-item-type', lone);
+    if (lone) {
+      solo.dataset.v2ItemType = 'subagent';
+      solo.setAttribute('aria-description', 'Running');
+      solo.innerHTML = avatar(providers[0]) + ' Subagent';
+    }
+    const count = S.dw + done;
+    sg.hidden = S.dw === 0 || lone;
+    $('sgb').setAttribute('aria-label', `${count} subagents`);
+    const desc = sg.hidden ? '' : `${S.dw} working · ${done} done`;
+    $('sgb').setAttribute('aria-description', desc); $('sgd').textContent = desc;
+    $('sgn').textContent = `${count} subagents`;
+    const avatars = Array.from({ length: Math.min(count, 3) }, (_, i) =>
+      avatar(providers[i]) || '<span aria-hidden="true"></span>');
+    if (count > 3) avatars.push(`<span>+${count - 3}</span>`);
+    $('avatars').innerHTML = sg.hidden ? '' : avatars.join('');
+    // thread state
+    const st = S.state === 'doze' ? 'done' : S.state;
+    const label = { working: 'Working', waiting: 'Input', failed: 'Failed', done: null }[st];
+    $('row').setAttribute('aria-label', ['Erebor theme', label, 'scratch'].filter(Boolean).join(', '));
+    $('row').setAttribute('aria-current', 'page');
+    $('send').setAttribute('aria-label', st === 'working' ? 'Stop generation' : 'Send');
+    $('pending').hidden = st !== 'waiting';   // the app mounts the toggle only while a question is pending
+    $('pending').toggleAttribute('data-pending-user-input-toggle', st === 'waiting');
+    // doze: jump 125 s into the toast -> doze timer (the mock only; the app has no such knob)
+    document.documentElement.style.setProperty('--erb-anim-king',
+      S.state === 'doze' ? 'erb-king-done 120s steps(1, end) -125s both' : '');
+    if (S.state !== 'doze') document.documentElement.style.removeProperty('--erb-anim-king');
+    $('ctx').value = S.ctx; $('ctxv').textContent = S.ctx + '%'; $('se').value = S.s; $('wk').value = S.wk;
+    stSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.n === S.state)));
+    dwSeg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.n === S.dw)));
+    $('sb').setAttribute('aria-pressed', String(S.sb)); $('det').setAttribute('aria-pressed', String(S.det));
+    document.querySelectorAll('[data-w]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.w === S.w)));
+  }
+  apply();
+  window.__setDw = n => { S.dw = n; apply(); };
+  const tl = num('tl', 0, 100000, 0);
+  if (tl) {
+    const lane = $('lane'); lane.style.overflowY = 'auto'; lane.style.justifyContent = 'flex-start';
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < tl; i++) {
+      const row = document.createElement('div'); row.className = 'chat-markdown'; row.setAttribute('data-timeline-row', i);
+      row.innerHTML = '<p><span class="a">Step ' + i + '</span> <code>fn_' + i + '()</code> <em>ran</em> and <strong>passed</strong>.</p>' +
+        '<div data-v2-item-type="tool" aria-description="Completed"><button aria-label="Tool call ' + i + '"><span class="size-6"><span class="isolate"><svg viewBox="0 0 16 16"><path d="M0 0h16v16z"/></svg></span></span><span>read file</span></button></div>';
+      frag.appendChild(row);
+    }
+    lane.insertBefore(frag, lane.firstChild); lane.scrollTop = lane.scrollHeight;
+  }
+  const churn = num('churn', 0, 1000, 0);   // ms between simulated streaming mutations
+  if (churn) {
+    const tgt = document.querySelector('.lane > .chat-markdown:last-child'); let k = 0;
+    const cm = q.get('cm') || 'all'; const other = document.querySelector('[data-user-message-bubble]');
+    if (cm !== 'all') { setInterval(() => { k++;
+      if (cm === 'text') tgt.lastElementChild.firstChild.appendData(' t' + k);
+      else if (cm === 'span') { const sp = document.createElement('span'); sp.textContent = ' s' + k; tgt.lastElementChild.appendChild(sp); if (k % 200 === 0) tgt.lastElementChild.textContent = 'x'; }
+      else if (cm === 'aria') other.setAttribute('aria-label', 'msg ' + k);
+      else if (cm === 'ariasame') other.setAttribute('aria-label', 'msg');
+      else if (cm === 'desc') $('sgb').setAttribute('aria-description', S.dw + ' working · 1 done · ' + k);
+      else if (cm === 'class') other.classList.toggle('foo');
+      else if (cm === 'data') other.setAttribute('data-state', 's' + k);
+      else if (cm === 'row') { const row = document.createElement('div'); row.innerHTML = '<p>new</p><div data-v2-item-type="tool" aria-description="Completed"><button aria-label="Tool ' + k + '"><span class="size-6"><span class="isolate"><svg viewBox="0 0 16 16"></svg></span></span></button></div>'; tgt.appendChild(row); if (k % 50 === 0) tgt.replaceChildren(tgt.firstElementChild); }
+      else if (cm === 'plainrow') { const row = document.createElement('div'); row.innerHTML = '<p>new <b>x</b></p><div><i>y</i></div>'; tgt.appendChild(row); if (k % 50 === 0) tgt.replaceChildren(tgt.firstElementChild); }
+    }, churn); } else
+    setInterval(() => {
+      const sp = document.createElement('span'); sp.textContent = ' tok' + (k++); tgt.lastElementChild.appendChild(sp);
+      if (k % 4 === 0) $('sgb').setAttribute('aria-label', (S.dw + 1) + ' subagents'), $('sgd').textContent = S.dw + ' working · 1 done · ' + k;
+      if (tgt.lastElementChild.childElementCount > 200) tgt.lastElementChild.textContent = '';
+    }, churn);
+  }
+  document.documentElement.dataset.elements = document.querySelectorAll('*').length;
+})();
+</script>
+</body>
+</html>

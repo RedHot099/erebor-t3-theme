@@ -1,0 +1,8 @@
+# test output (readable builds, traces)
+tests/.out/
+# review images the generators write next to their sources
+src/_*.png
+src/_*.gif
+# caches
+__pycache__/
+.ruff_cache/
